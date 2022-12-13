@@ -1,0 +1,173 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Bazel (http://bazel.io/) WORKSPACE file for Eidos.
+
+workspace(name = "com_google_eidos_audition")
+
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# -------------------------------------------------------------------------
+# ZLib. See https://zlib.net.
+# -------------------------------------------------------------------------
+
+http_archive(
+    name = "net_zlib",
+    build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
+    sha256 = "b3a24de97a8fdbc835b9833169501030b8977031bcb54b3b3ac13740f846ab30",
+    strip_prefix = "zlib-1.2.13",
+    urls = ["https://zlib.net/zlib-1.2.13.tar.gz"],
+)
+
+# -------------------------------------------------------------------------
+# Google protocol buffers. See
+#    https://github.com/protocolbuffers/protobuf
+# -------------------------------------------------------------------------
+protobuf_version = "3.21.9"
+protobuf_sha256 = "1add10f9bd92775b91f326da259f243881e904dd509367d5031d4c782ba82810"
+
+http_archive(
+    name = "com_google_protobuf",
+    sha256 = protobuf_sha256,
+    strip_prefix = "protobuf-%s" % protobuf_version,
+    urls = ["https://github.com/protocolbuffers/protobuf/archive/v%s.tar.gz" %
+            protobuf_version],
+)
+
+# Dependencies.
+http_archive(
+    name = "bazel_skylib",
+    strip_prefix = "bazel-skylib-main",
+    urls = ["https://github.com/bazelbuild/bazel-skylib/archive/main.zip"],
+)
+
+# Import external protobuf dependencies into this workspace.
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
+
+# -------------------------------------------------------------------------
+# Google testing/mocking framework. See
+#    https://github.com/google/googletest
+# -------------------------------------------------------------------------
+
+http_archive(
+    name = "com_google_googletest",
+    strip_prefix = "googletest-main",
+    urls = ["https://github.com/google/googletest/archive/main.zip"],
+)
+
+# -------------------------------------------------------------------------
+# Google Abseil - C++ Common Libraries
+# -------------------------------------------------------------------------
+
+http_archive(
+    name = "com_google_absl",
+    strip_prefix = "abseil-cpp-master",
+    urls = ["https://github.com/abseil/abseil-cpp/archive/master.zip"],
+)
+
+# -------------------------------------------------------------------------
+# Google Abseil - Python Common Libraries
+# -------------------------------------------------------------------------
+
+http_archive(
+    name = "io_abseil_py",
+    strip_prefix = "abseil-py-main",
+    urls = ["https://github.com/abseil/abseil-py/archive/main.zip"],
+)
+
+# -------------------------------------------------------------------------
+# Eigen
+# -------------------------------------------------------------------------
+
+eigen_version = "3.3.8"
+
+eigen_sha256 = "146a480b8ed1fb6ac7cd33fec9eb5e8f8f62c3683b3f850094d9d5c35a92419a"
+
+http_archive(
+    name = "com_gitlab_eigen",
+    build_file = "@//build:eigen.BUILD",
+    sha256 = eigen_sha256,
+    strip_prefix = "eigen-%s" % eigen_version,
+    url = "https://gitlab.com/libeigen/eigen/-/archive/%s/eigen-%s.tar.gz" % (
+        eigen_version, eigen_version),
+)
+
+# -------------------------------------------------------------------------
+# wave: Simple C++ library for reading and writting wave files
+# -------------------------------------------------------------------------
+
+wave_version = "0.8.2a"
+
+http_archive(
+    name = "com_github_wave",
+    build_file = "@//build:wave.BUILD",
+    urls = ["https://github.com/audionamix/wave/archive/v%s.tar.gz" % wave_version],
+    sha256 = "371f49bed7599323579ad95829510e1cfbdefe934547025598b22a8b5010fcb4",
+    strip_prefix = "wave-%s/src" % wave_version,
+)
+
+# -------------------------------------------------------------------------
+# CAR-FAC (cascade of asymmetric resonators with fast-acting compression).
+# -------------------------------------------------------------------------
+
+new_git_repository(
+    name = "com_google_carfac",
+    build_file = "@//build:carfac.BUILD",
+    commit = "e70ad6107961bfd68defe60fa258beeed4e9b65d",
+    remote = "https://github.com/google/carfac.git",
+)
+
+# -------------------------------------------------------------------------
+# cnpy: library to read/write .npy and .npz files in C/C++
+# -------------------------------------------------------------------------
+
+new_git_repository(
+    name = "com_github_cnpy",
+    build_file = "@//build:cnpy.BUILD",
+    commit = "4e8810b1a8637695171ed346ce68f6984e585ef4",
+    remote = "https://github.com/rogersce/cnpy.git",
+)
+
+# -------------------------------------------------------------------------
+# Six is a Python 2 and 3 compatibility library. See
+#   https://github.com/benjaminp/six
+# -------------------------------------------------------------------------
+
+six_version = "1.16.0"
+
+http_archive(
+    name = "six_archive",
+    build_file = "@//build:six.BUILD",
+    sha256 = "af6745f78dceb1ad5107dc6c2d3646c8cb57cf4668ba7b5427145a71a690f60e",
+    strip_prefix = "six-%s" % six_version,
+    urls = ["https://github.com/benjaminp/six/archive/refs/tags/%s.tar.gz" % six_version],
+)
+
+# -------------------------------------------------------------------------
+# Polyphase resampler library (C++ implementation of Matlab's resample).
+# -------------------------------------------------------------------------
+
+new_git_repository(
+    name = "com_github_resample",
+    build_file = "@//build:resample.BUILD",
+    commit = "828a53db55c5e756fdffbd1459dcfba24c6fc9e7",
+    remote = "https://github.com/terrygta/SignalResampler.git",
+)
+
+# Local Variables:
+# mode: python
+# End:
